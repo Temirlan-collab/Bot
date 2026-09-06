@@ -1,0 +1,235 @@
+import json
+import os
+import asyncio
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from aiogram.types import KeyboardButton, WebAppInfo, ReplyKeyboardMarkup
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = os.getenv("ADMIN_ID")
+
+if not BOT_TOKEN or not ADMIN_ID:
+    print("❌ Ошибка: не найдены BOT_TOKEN или ADMIN_ID в .env файле")
+    exit(1)
+
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
+
+# ===== КЛАВИАТУРЫ =====
+
+def main_keyboard():
+    kb = [
+        [types.KeyboardButton(text="📋 Услуги и цены")],
+        [types.KeyboardButton(text="💰 Тарифы"), types.KeyboardButton(text="❓ Частые вопросы")],
+        [types.KeyboardButton(text="🖼️ Портфолио"), types.KeyboardButton(text="📞 Контакты")],
+        [types.KeyboardButton(text="📩 Отправить заявку"), types.KeyboardButton(text="🚀 Web App")],
+        [types.KeyboardButton(text="🆘 Помощь")]
+    ]
+    return ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+
+def web_app_keyboard():
+    button = KeyboardButton(
+        text="🚀 Открыть калькулятор услуг",
+        web_app=WebAppInfo(url="https://fullcuclelab.netlify.app/tg-app.html")
+    )
+    return ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
+
+# ===== КОМАНДЫ =====
+
+@dp.message(Command("start"))
+async def start_command(message: types.Message):
+    await message.answer(
+        f"👋 Привет, {message.from_user.first_name}!\n\n"
+        "Я — бот студии NEO.LAB.\n"
+        "Выберите нужный раздел в меню ниже:",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("help"))
+async def help_command(message: types.Message):
+    await message.answer(
+        "🆘 **Помощь**\n\n"
+        "Доступные команды:\n"
+        "/start — 🏠 Главное меню\n"
+        "/services — 📋 Услуги и цены\n"
+        "/price — 💰 Рассчитать стоимость\n"
+        "/tariffs — 📊 Подробные тарифы\n"
+        "/portfolio — 🖼️ Портфолио\n"
+        "/order — 📩 Оставить заявку\n"
+        "/faq — ❓ Частые вопросы\n"
+        "/contacts — 📞 Контакты\n"
+        "/support — 🛟 Техподдержка\n"
+        "/id — 🆔 Мой ID",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("services"))
+async def services_command(message: types.Message):
+    await message.answer(
+        "📋 **Услуги NEO.LAB**\n\n"
+        "🛰 **Сайты** — от 150 000 ₸\n"
+        "🤖 **Боты** — от 50 000 ₸\n"
+        "🌐 **Переводы** — от 2 500 ₸/стр.\n\n"
+        "Подробнее: /tariffs",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("price"))
+async def price_command(message: types.Message):
+    await message.answer(
+        "💰 **Расчет стоимости**\n\n"
+        "• Лендинг: от 150 000 ₸\n"
+        "• Сайт + бот: от 350 000 ₸\n"
+        "• Комплекс: от 600 000 ₸\n\n"
+        "📩 Для точного расчета отправьте /order",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("tariffs"))
+async def tariffs_command(message: types.Message):
+    await message.answer(
+        "📊 **Тарифы**\n\n"
+        "🚀 СТАРТ — 150 000 ₸\n"
+        "🔥 БИЗНЕС — 350 000 ₸\n"
+        "💎 ГЛОБАЛ — от 600 000 ₸",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("portfolio"))
+async def portfolio_command(message: types.Message):
+    await message.answer(
+        "🖼️ **Портфолио**\n\n"
+        "🔹 NOVA Store — интернет-магазин\n"
+        "🔹 Fresh24 — бот доставки\n"
+        "🔹 SaaS локализация\n\n"
+        "🌐 https://fullcuclelab.netlify.app",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("order"))
+async def order_command(message: types.Message):
+    await message.answer(
+        "📩 **Заявка**\n\n"
+        "Напишите:\n"
+        "1. Имя\n"
+        "2. Услуга\n"
+        "3. Описание\n"
+        "4. Телефон",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("faq"))
+async def faq_command(message: types.Message):
+    await message.answer(
+        "❓ **FAQ**\n\n"
+        "1. Цена от сложности\n"
+        "2. Дизайн — на ваш выбор\n"
+        "3. Оплата — 50/50\n"
+        "4. Гарантия — 30 дней",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+# ===== КОНТАКТЫ (команда) =====
+@dp.message(Command("contacts"))
+async def contacts_command(message: types.Message):
+    await message.answer(
+        "📞 **Контакты NEO.LAB**\n\n"
+        "📱 **Телефон:** +7 (777) 206-24-88\n"
+        "✈️ **Telegram:** @FullCycle_bot\n"
+        "📧 **Email:** hello@neolab.studio\n"
+        "🌐 **Сайт:** https://fullcuclelab.netlify.app\n\n"
+        "🕒 Режим работы: Пн–Вс, 10:00–22:00 (AST)\n"
+        "⚡ Срочные задачи — в день обращения.",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+
+@dp.message(Command("support"))
+async def support_command(message: types.Message):
+    await message.answer(
+        "🛟 **Поддержка 24/7**\n\n"
+        "📱 +7 (777) 206-24-88\n"
+        "✈️ @FullCycle_bot\n\n"
+        "⏱️ Отвечаю в течение 15 минут!",
+        parse_mode="Markdown",
+        reply_markup=main_keyboard()
+    )
+
+@dp.message(Command("id"))
+async def get_id(message: types.Message):
+    await message.answer(
+        f"🆔 **Ваш ID:** `{message.from_user.id}`",
+        parse_mode="Markdown"
+    )
+
+# ===== КНОПКИ =====
+
+@dp.message(lambda message: message.text == "📋 Услуги и цены")
+async def btn_services(message: types.Message):
+    await services_command(message)
+
+@dp.message(lambda message: message.text == "💰 Тарифы")
+async def btn_tariffs(message: types.Message):
+    await tariffs_command(message)
+
+@dp.message(lambda message: message.text == "❓ Частые вопросы")
+async def btn_faq(message: types.Message):
+    await faq_command(message)
+
+@dp.message(lambda message: message.text == "🖼️ Портфолио")
+async def btn_portfolio(message: types.Message):
+    await portfolio_command(message)
+
+@dp.message(lambda message: message.text == "📞 Контакты")
+async def btn_contacts(message: types.Message):
+    await contacts_command(message)
+
+@dp.message(lambda message: message.text == "📩 Отправить заявку")
+async def btn_order(message: types.Message):
+    await order_command(message)
+
+@dp.message(lambda message: message.text == "🚀 Web App")
+async def btn_webapp(message: types.Message):
+    await message.answer(
+        "🚀 Откройте форму:",
+        reply_markup=web_app_keyboard()
+    )
+
+@dp.message(lambda message: message.text == "🆘 Помощь")
+async def btn_help(message: types.Message):
+    await help_command(message)
+
+# ===== WEB APP =====
+@dp.message(lambda message: message.web_app_data is not None)
+async def handle_web_app_data(message: types.Message):
+    try:
+        data = json.loads(message.web_app_data.data)
+        notification = (
+            "📩 **НОВАЯ ЗАЯВКА из Web App!**\n\n"
+            f"👤 **Имя:** {data.get('name', 'Не указано')}\n"
+            f"📞 **Телефон:** {data.get('phone', 'Не указан')}\n"
+            f"🛠️ **Услуга:** {data.get('service', 'Не выбрана')}"
+        )
+        await bot.send_message(chat_id=ADMIN_ID, text=notification, parse_mode="Markdown")
+        await message.answer("✅ Спасибо! Заявка принята.", reply_markup=main_keyboard())
+    except Exception as e:
+        print(f"Ошибка: {e}")
+
+# ===== ЗАПУСК =====
+async def main():
+    print("🤖 Бот NEO.LAB запущен!")
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
