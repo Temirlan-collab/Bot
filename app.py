@@ -15,6 +15,10 @@ def home():
 def health():
     return "OK"
 
+@app.route('/status')
+def status():
+    return "✅ Бот работает"
+
 # Функция для запуска бота
 def run_bot():
     print("🚀 Запускаем бота...")
@@ -23,23 +27,8 @@ def run_bot():
     except Exception as e:
         print(f"❌ Ошибка бота: {e}")
 
-# Функция для проверки, что бот жив (опционально)
-@app.route('/status')
-def status():
-    return "✅ Бот работает"
-
-# Запускаем бота в отдельном потоке при старте Flask
-# Даем Flask немного времени, чтобы запуститься, потом стартуем бота
-def start_bot_with_delay():
-    time.sleep(2)  # Ждем, пока Flask запустится
-    run_bot()
-
-if __name__ == "__main__":
-    # Запускаем бота в фоновом потоке
-    bot_thread = threading.Thread(target=start_bot_with_delay)
-    bot_thread.daemon = True
-    bot_thread.start()
-    
-    # Запускаем Flask
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+# ЗАПУСКАЕМ БОТА СРАЗУ ПРИ ИМПОРТЕ
+print("⏳ Инициализация бота...")
+bot_thread = threading.Thread(target=run_bot, daemon=True)
+bot_thread.start()
+print("✅ Бот запущен в фоновом потоке!")
