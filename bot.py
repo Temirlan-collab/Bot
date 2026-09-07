@@ -146,7 +146,6 @@ async def faq_command(message: types.Message):
         reply_markup=main_keyboard()
     )
 
-# ===== КОНТАКТЫ (БЕЗ MARKDOWN) =====
 @dp.message(Command("contacts"))
 async def contacts_command(message: types.Message):
     await message.answer(
@@ -213,7 +212,34 @@ async def btn_webapp(message: types.Message):
 async def btn_help(message: types.Message):
     await help_command(message)
 
+# ===== ПЕРЕСЫЛКА СООБЩЕНИЙ АДМИНУ =====
+
+@dp.message()
+async def forward_to_admin(message: types.Message):
+    """Пересылает все сообщения от пользователей админу"""
+    
+    if str(message.from_user.id) == ADMIN_ID:
+        return
+    
+    if message.text and message.text.startswith('/'):
+        return
+    
+    if message.web_app_data:
+        return
+    
+    try:
+        await bot.send_message(
+            chat_id=ADMIN_ID,
+            text=f"📩 Сообщение от @{message.from_user.username or 'нет'} (ID: {message.from_user.id}):\n\n{message.text}"
+        )
+        await message.answer(
+            "✅ Ваше сообщение отправлено! Я отвечу в ближайшее время."
+        )
+    except Exception as e:
+        print(f"Ошибка пересылки: {e}")
+
 # ===== WEB APP =====
+
 @dp.message(lambda message: message.web_app_data is not None)
 async def handle_web_app_data(message: types.Message):
     try:
@@ -228,4 +254,4 @@ async def handle_web_app_data(message: types.Message):
         await bot.send_message(chat_id=ADMIN_ID, text=notification)
         await message.answer("✅ Спасибо! Заявка принята.", reply_markup=main_keyboard())
     except Exception as e:
-        print(f"Ошибка: {e}")
+        print(f"Ошибка Web App: {e}")
