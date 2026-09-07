@@ -255,3 +255,12 @@ async def handle_web_app_data(message: types.Message):
         await message.answer("✅ Спасибо! Заявка принята.", reply_markup=main_keyboard())
     except Exception as e:
         print(f"Ошибка Web App: {e}")
+
+# ===== ЗАПУСК БОТА =====
+
+async def main():
+    print("🤖 Бот NEO.LAB запущен!")
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
