@@ -1,6 +1,5 @@
-# render.yaml
 services:
-  # Веб-сервис (нужен для порта и UptimeRobot)
+  # Веб-сервис (нужен только для порта)
   - type: web
     name: neolab-bot-web
     runtime: python
@@ -13,10 +12,8 @@ services:
         sync: false
       - key: ADMIN_ID
         sync: false
-      - key: PORT
-        value: 10000
 
-  # Фоновый воркер для бота
+  # Фоновый воркер (сам бот)
   - type: worker
     name: neolab-bot-worker
     runtime: python
